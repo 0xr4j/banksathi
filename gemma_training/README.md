@@ -39,10 +39,14 @@ python3 convert_to_mediapipe.py --merged-dir outputs/gemma2-2b-banksathi/merged_
 * Colab can hand out a CPU-only runtime even when T4 is selected. Check that `nvidia-smi` shows `Tesla T4`.
 * The training script now handles `transformers` 5.x: it computes `warmup_steps` and passes `dtype=`.
 * Colab's preinstalled `torchao` breaks the PEFT merge, so the notebook uninstalls it.
-* `convert_to_mediapipe.py` needs **at least 25-30 GB of system RAM**. The free Colab machine (12 GB) is
-  OOM-killed while it builds the graph, and swap is not allowed on Colab. Run it on Colab High-RAM, Kaggle
-  (30 GB) or a PC with 32 GB or more. Pin `mediapipe==0.10.35`, because versions 1.x dropped the
-  `genai` bundler.
+* `convert_to_mediapipe.py` now defaults to `--engine mediapipe`: the MediaPipe GenAI converter
+  (`model_type=GEMMA2_2B`, CPU, int4 FFN / int8 attention) quantizes layer by layer and needs only ~3 GB
+  RAM. It writes `gemma2-2b-banksathi-cpu-int4.bin` (~1.67 GB), which LlmInference loads directly.
+  The old `--engine litert` path (litert-torch INT4 `.task`) was OOM-killed even on Kaggle's 31 GB.
+  Pin `mediapipe==0.10.35`, because versions 1.x dropped the `genai` converter and bundler.
+* Kaggle works without a Hugging Face token: attach the dataset with the adapter and the Kaggle model
+  `google/gemma-2/transformers/gemma-2-2b-it` (accept its licence on Kaggle first), then run
+  `train_gemma2b_qlora.py --merge-only --model-id /kaggle/input/...` on CPU (~1 minute).
 * First run: 4 of 5 gates passed. JSON was 98.67%: 3 Hinglish KCC rows answered `"task":"LOAN"`. To fix it,
   add more Hinglish KCC templates and/or train for `--epochs 5`.
 
