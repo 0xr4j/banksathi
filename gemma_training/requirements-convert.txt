@@ -1,0 +1,7 @@
+# INT4 TFLite conversion + MediaPipe bundling. Install in a FRESH Python session:
+# litert-torch (formerly ai-edge-torch) pins its own torch build and conflicts with the training stack.
+litert-torch>=0.10.0
+# mediapipe >= 1.0 dropped mediapipe.tasks.python.genai (the .task bundler); 0.10.35 has it and supports Python 3.13
+mediapipe==0.10.35
+safetensors
+sentencepiece

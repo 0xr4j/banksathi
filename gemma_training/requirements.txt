@@ -1,0 +1,8 @@
+# Training + evaluation stack (Google Colab T4). torch comes preinstalled on Colab.
+transformers>=4.44.0
+peft>=0.12.0
+accelerate>=0.33.0
+bitsandbytes>=0.43.3
+datasets>=2.20.0
+sentencepiece>=0.2.0
+huggingface_hub>=0.24.0
