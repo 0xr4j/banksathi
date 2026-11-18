@@ -22,10 +22,3 @@ failure playbook.
 
 4 of 5 KPI gates passed on the 226-row hold-out set: ScamGuard recall 100%, safe abstention 100%,
 intent accuracy and bilingual TTS above target. Valid JSON was 98.67% against a 99% target.
-
-## Credits
-
-* **Raj Jha** ([@0xr4j](https://github.com/0xr4j))
-* **Nikhil**
-
-Built together by Raj and Nikhil.
