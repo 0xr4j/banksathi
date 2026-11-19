@@ -215,7 +215,10 @@ def last4(rng: random.Random) -> str:
 
 
 def phone(rng: random.Random) -> str:
-    return str(rng.choice("6789")) + "".join(str(rng.randint(0, 9)) for _ in range(9))
+    # Masked (e.g. 67XXXXXX72) so the public dataset never names a real person's number as a scammer.
+    # The same random draws are made as before, so every other row of the dataset stays identical.
+    digits = str(rng.choice("6789")) + "".join(str(rng.randint(0, 9)) for _ in range(9))
+    return digits[:2] + "XXXXXX" + digits[-2:]
 
 
 def short_code(rng: random.Random, n: int = 6) -> str:
