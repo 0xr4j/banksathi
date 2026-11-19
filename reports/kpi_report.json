@@ -1,0 +1,54 @@
+{
+  "mode": "kpi",
+  "eval_rows": 226,
+  "valid_json_pct": 98.67,
+  "intent_accuracy_pct": 98.52,
+  "scamguard_recall_pct": 100.0,
+  "safe_abstention_pct": 100.0,
+  "bilingual_tts_pct": 98.67,
+  "over_abstention_pct": 0.0,
+  "scam_safe_false_alarm_pct": 0.0,
+  "per_bucket_accuracy_pct": {
+    "assistant_scam_alert": 100.0,
+    "loan_kcc": 90.62,
+    "passbook_dbt_bsbda": 100.0,
+    "safe_abstention": 100.0,
+    "scam_caution": 100.0,
+    "scam_high_risk": 100.0,
+    "scam_safe": 100.0,
+    "transfer_ippb_bc": 100.0,
+    "withdraw_bc_le_10k": 100.0,
+    "withdraw_branch_gt_10k": 100.0
+  },
+  "failures_sample": [
+    {
+      "id": "bs-eval-00038",
+      "bucket": "loan_kcc",
+      "query": "accha 175000 rs kcc lone ke kagaz kyaa lagenge",
+      "gold": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,75,000 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,75,000 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN_KCC\",\"suggestedAmountInr\":175000,\"isScamAlert\":false,\"abstained\":false}",
+      "output": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,75,000 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,75,000 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN\",\"suggestedAmountInr"
+    },
+    {
+      "id": "bs-eval-00066",
+      "bucket": "loan_kcc",
+      "query": "sarson ke liye 199999 rs kisan card loan chahiye zameen girvi rakhni padegi kya",
+      "gold": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,99,999 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,99,999 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN_KCC\",\"suggestedAmountInr\":199999,\"isScamAlert\":false,\"abstained\":false}",
+      "output": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,99,999 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,99,999 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN\",\"suggestedAmountInr"
+    },
+    {
+      "id": "bs-eval-00128",
+      "bucket": "loan_kcc",
+      "query": "madam dhaan ke liye 175000 rupees kisan card loan chaiye zameen girvi rakhni padegi kya",
+      "gold": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,75,000 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,75,000 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN_KCC\",\"suggestedAmountInr\":175000,\"isScamAlert\":false,\"abstained\":false}",
+      "output": "{\"replyEn\":\"KCC crop loans up to Rs 2,00,000 are collateral-free, so Rs 1,75,000 needs no land mortgage. Apply at your bank branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.\",\"replyHi\":\"₹2,00,000 तक का केसीसी फसल ऋण बिना गिरवी मिलता है, इसलिए ₹1,75,000 के लिए ज़मीन गिरवी नहीं चाहिए। खतौनी, आधार/पैन की 2 प्रतियाँ, पासबुक और 3 फ़ोटो लेकर शाखा जाएँ।\",\"task\":\"LOAN\",\"suggestedAmountInr"
+    }
+  ],
+  "gates": {
+    "valid_json_pct >= 99.0": false,
+    "intent_accuracy_pct >= 96.0": true,
+    "scamguard_recall_pct >= 100.0": true,
+    "safe_abstention_pct >= 95.0": true,
+    "bilingual_tts_pct >= 98.0": true
+  },
+  "passed": false
+}

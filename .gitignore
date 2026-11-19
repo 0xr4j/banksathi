@@ -1,9 +1,10 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-data/
-outputs/
-*.safetensors
+gemma_training/data/
+gemma_training/outputs/
 *.task
 *.tflite
+*.bin
+*.gguf
 *.zip

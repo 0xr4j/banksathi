@@ -313,6 +313,26 @@ print(tok.decode(model.generate(**ids, max_new_tokens=200, do_sample=False)[0, i
 | 🧪 Live demo (runs in your browser) | [huggingface.co/spaces/0xr4j/banksathi-demo](https://huggingface.co/spaces/0xr4j/banksathi-demo) |
 | 🛠️ Pipeline code | [`gemma_training/`](gemma_training/) · details in [`gemma_training/README.md`](gemma_training/README.md) |
 
+### 🗂️ What's in this repo
+
+```text
+banksathi/
+├── gemma_training/        dataset generator, eval gate, QLoRA trainer, converter, Colab notebooks
+├── kaggle/                kaggle_merge_and_convert.py: merge + phone .bin + GGUF on a free Kaggle CPU
+├── adapter/               the trained LoRA adapter (83 MB) + adapter_config.json
+├── data/                  the 1,500-row dataset (train.jsonl, eval.jsonl) + stats and audit
+├── reports/               hold-out KPI report + training metrics
+├── demo/                  the in-browser demo (wllama + GGUF), same files as the HF Space
+└── docs/                  MODEL_CARD.md (the Hugging Face card) + diagram images
+```
+
+The big model files are too large for GitHub (100 MB per-file limit), so they live on Hugging Face:
+
+| File | Size | Download |
+|---|---|---|
+| Phone model `gemma2-2b-banksathi-cpu-int4.bin` | 1.67 GB | [mediapipe/](https://huggingface.co/0xr4j/banksathi-gemma2-2b/tree/main/mediapipe) |
+| GGUF `banksathi-gemma2-2b-Q8_0-*.gguf` (6 shards) | 2.78 GB | [gguf/](https://huggingface.co/0xr4j/banksathi-gemma2-2b/tree/main/gguf) |
+
 ## 🧭 Roadmap
 
 - [x] Synthetic bilingual dataset with audit gates

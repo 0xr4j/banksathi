@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BankSathi</title>
+<style>
+  :root { --bg:#f7f8f5; --card:#ffffff; --ink:#1d2421; --muted:#5d6b64; --line:#dde3df; --accent:#1f7a4d;
+          --warn:#a15c00; --bad:#b3261e; --code:#f1f4f2; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111614; --card:#1a201d; --ink:#e7ece9; --muted:#9aa8a1; --line:#2c3531; --accent:#4cc38a;
+            --warn:#f0b35a; --bad:#ff8a80; --code:#202825; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui,-apple-system,"Segoe UI",
+         "Noto Sans Devanagari",sans-serif; }
+  main { max-width:760px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin:14px 0; }
+  .tabs { display:flex; gap:8px; margin-top:8px; }
+  .tabs button { flex:1; }
+  button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:8px;
+           padding:10px 14px; cursor:pointer; }
+  button.primary, .tabs button[aria-selected="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  textarea { width:100%; font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line);
+             border-radius:8px; padding:10px; resize:vertical; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 12px; }
+  .chips button { font-size:.85rem; padding:6px 10px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  #status { color:var(--muted); font-size:.92rem; }
+  progress { width:100%; height:8px; }
+  pre { background:var(--code); border-radius:8px; padding:12px; overflow:auto; font-size:.85rem; white-space:pre-wrap; }
+  .tag { display:inline-block; font-size:.8rem; border:1px solid var(--line); border-radius:999px; padding:2px 8px; margin:2px 4px 2px 0; }
+  .alert { border-left:4px solid var(--bad); padding:8px 12px; background:var(--code); border-radius:6px; }
+  .note { font-size:.85rem; color:var(--muted); }
+  .hidden { display:none; }
+  label.ctx { display:block; font-size:.88rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🏦 BankSathi</h1>
+  <p class="sub">Gemma-2 2B fine-tuned for rural Indian banking, in English and हिंदी. The model runs <b>entirely in your
+    browser</b> (llama.cpp compiled to WebAssembly), just like it runs offline on the phone. Nothing you type leaves this device.
+    <a href="https://huggingface.co/0xr4j/banksathi-gemma2-2b">Model card</a></p>
+
+  <div class="card">
+    <div class="row"><button id="load" class="primary">Load model (~2.8 GB, cached after first time)</button>
+      <span id="status">Works best in desktop Chrome or Edge with 8 GB+ RAM. Each answer takes about 20-60 s.</span></div>
+    <progress id="prog" class="hidden" max="1" value="0"></progress>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="a">Banking assistant</button>
+    <button role="tab" aria-selected="false" data-tab="b">SMS scam check</button>
+  </div>
+
+  <section id="tab-a" class="card">
+    <textarea id="qa" rows="2" placeholder="Ask in English, हिंदी or Hinglish"></textarea>
+    <div class="chips" id="ex-a"></div>
+    <details><summary class="note">Attach verified RBI context (optional)</summary><div id="ctx"></div></details>
+    <div class="row" style="margin-top:10px"><button id="ask" class="primary" disabled>Ask</button></div>
+  </section>
+
+  <section id="tab-b" class="card hidden">
+    <textarea id="qb" rows="3" placeholder="Paste a bank SMS"></textarea>
+    <div class="chips" id="ex-b"></div>
+    <div class="row"><button id="check" class="primary" disabled>Check</button></div>
+  </section>
+
+  <div id="out" class="card hidden"></div>
+
+  <p class="note">⚠️ Not financial advice. The model can be wrong and RBI rules change (facts verified 2026-11-14).
+    Always confirm with your bank branch. Cyber fraud helpline: <b>1930</b>.</p>
+</main>
+
+<script type="module">
+import { Wllama } from "https://cdn.jsdelivr.net/npm/@wllama/wllama@3.13.0/esm/index.js";
+import WasmFromCDN from "https://cdn.jsdelivr.net/npm/@wllama/wllama@3.13.0/esm/wasm-from-cdn.js";
+
+const MODEL_URL = "https://huggingface.co/0xr4j/banksathi-gemma2-2b/resolve/main/gguf/banksathi-gemma2-2b-Q8_0-00001-of-00006.gguf";
+const VERIFIED = "2026-11-14";
+const SOURCES = {
+  "RBI_BC_BSBDA_01": "Cash up to Rs 10,000 can be withdrawn via AePS thumb scan at a Bank Mitra (BC point). No extra BC fee or commission. Carry original Aadhaar and phone; printed receipt is mandatory.",
+  "RBI_BC_AEPS_04": "Amounts above Rs 10,000 exceed the standard AePS BC limit. Route to the bank branch or ATM with passbook, Aadhaar and RuPay/ATM debit card.",
+  "RBI_BC_TRANSFER_03": "Domestic cash deposit and transfer are supported at the Post Office (IPPB) or Bank Mitra. Carry Aadhaar, receiver account number and IFSC; take printed receipt.",
+  "RBI_BSBDA_DBT_02": "PMJDY/BSBDA accounts need zero minimum balance, allow unlimited deposits and at least 4 free withdrawals a month. DBT credits can be checked at BC; passbook is printed at the branch.",
+  "RBI_KCC_MASTER_01": "Kisan Credit Card crop and allied loans up to Rs 2,00,000 are collateral-free. Apply at the branch with Khatauni, 2 Aadhaar/PAN copies, passbook and 3 photos.",
+  "RBI_ZERO_LIABILITY_1930": "OTP/PIN/CVV requests, AnyDesk or .apk installs, bit.ly KYC links, or AePS double-thumb without receipt are fraud. Call 1930 immediately and notify the bank within 3 working days for zero liability."
+};
+const TASK_A_HEADER = "You are BankSathi, an offline-first rural Indian banking assistant. Rephrase ONLY from Verified Context. If unsure, set abstained=true and task=\"NONE\".\nCore Rules: Cash <= 10000 -> BC_POINT; > 10000 -> BRANCH/ATM; KCC <= 2L -> BRANCH; Transfer -> IPPB/BC; OTP/KYC -> 1930.\nReturn JSON ONLY with keys: replyEn, replyHi, task, suggestedAmountInr, isScamAlert, abstained.";
+const TASK_B_HEADER = "Analyze this banking SMS or call scenario for rural fraud in India. Advise calling 1930 and reporting within 3 days on HIGH_RISK.\nReturn JSON ONLY with keys: riskLevel, explanationEn, explanationHi, actionTipEn, actionTipHi.";
+const NO_CONTEXT = "none (use Core Rules)";
+// Mirrors BankingRuleEngine.isImmediateScamPhrase(): rules fire before the LLM.
+const SCAM_RE = /\b(otp|anydesk|teamviewer|quicksupport|screen ?share|upi ?pin|atm ?pin|cvv|kyc (update|expire)|lottery|prize|digital arrest)\b/i;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let llm = null;
+
+const buildA = (q, ids) => `${TASK_A_HEADER}\nVerified Context:\n${ids.length ? ids.map((s) => `[${s} | Verified ${VERIFIED}] ${SOURCES[s]}`).join("\n") : NO_CONTEXT}\nUser: ${q}`;
+const buildB = (m) => `${TASK_B_HEADER}\nMessage: ${m}`;
+
+// Examples
+for (const t of ["Bhaiya 5000 rupaye nikalne hain", "25000 rupees nikalne hain", "150000 KCC loan documents?",
+                 "Caller asked OTP & AnyDesk", "Exact balance in SBI acct 30491?"]) {
+  const b = document.createElement("button"); b.textContent = t; b.onclick = () => ($("qa").value = t); $("ex-a").append(b);
+}
+for (const t of ["Rs 2000.00 credited to A/c XX1234 on 18-11-26 by PM-KISAN DBT. Avl Bal Rs 5310. -SBI",
+                 "Your SBI KYC expires today. Update now at http://sbi-kyc-verify.in or account will be blocked."]) {
+  const b = document.createElement("button"); b.textContent = t.slice(0, 42) + "…"; b.onclick = () => ($("qb").value = t); $("ex-b").append(b);
+}
+for (const id of Object.keys(SOURCES)) {
+  const l = document.createElement("label"); l.className = "ctx";
+  l.innerHTML = `<input type="checkbox" value="${id}"> ${id}`; $("ctx").append(l);
+}
+document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-selected", x === b));
+  $("tab-a").classList.toggle("hidden", b.dataset.tab !== "a");
+  $("tab-b").classList.toggle("hidden", b.dataset.tab !== "b");
+});
+
+$("load").onclick = async () => {
+  $("load").disabled = true; $("prog").classList.remove("hidden");
+  try {
+    llm = new Wllama(WasmFromCDN);
+    await llm.loadModelFromUrl(MODEL_URL, {
+      n_ctx: 1024,
+      progressCallback: ({ loaded, total }) => {
+        if (!total) return; $("prog").value = loaded / total;
+        $("status").textContent = `Downloading model… ${(loaded / 1e9).toFixed(2)} / ${(total / 1e9).toFixed(2)} GB`;
+      },
+    });
+    $("status").textContent = `✅ Model ready (${llm.isMultithread() ? "multi" : "single"}-thread). Everything now runs offline in this tab.`;
+    $("prog").classList.add("hidden"); $("ask").disabled = false; $("check").disabled = false;
+  } catch (e) {
+    console.error(e); $("status").textContent = "❌ " + e.message; $("load").disabled = false;
+  }
+};
+
+function parse(text) { const m = text.match(/\{[\s\S]*\}/); try { return m ? JSON.parse(m[0]) : null; } catch { return null; } }
+
+async function run(prompt, render, pre = "") {
+  $("out").classList.remove("hidden"); $("out").innerHTML = pre + `<p id="st" class="note">Thinking…</p><pre id="raw"></pre>`;
+  $("ask").disabled = $("check").disabled = true; const t0 = performance.now(); let text = "";
+  try {
+    const stream = await llm.createChatCompletion({
+      messages: [{ role: "user", content: prompt }], max_tokens: 256, temp: 0, top_k: 1, stream: true,
+    });
+    for await (const chunk of stream) {
+      text += chunk.choices?.[0]?.delta?.content ?? ""; $("raw").textContent = text;
+    }
+  } catch (e) { $("st").textContent = "❌ " + e.message; }
+  finally { $("ask").disabled = $("check").disabled = false; }
+  const secs = ((performance.now() - t0) / 1000).toFixed(1); const obj = parse(text);
+  $("out").innerHTML = pre + (obj ? render(obj) : `<p class="alert">Not valid JSON — the app would show its fallback reply.</p>`)
+    + `<p class="note">${secs}s · raw JSON the app receives:</p><pre>${esc(obj ? JSON.stringify(obj, null, 2) : text)}</pre>`;
+}
+
+$("ask").onclick = () => {
+  const q = $("qa").value.trim(); if (!q) return;
+  const ids = [...document.querySelectorAll("#ctx input:checked")].map((i) => i.value);
+  const pre = SCAM_RE.test(q) ? `<p class="alert">🚨 <b>Rule engine fired before the model:</b> this looks like a scam (OTP, PIN or remote-access app). Do not share anything. Call <b>1930</b> and report within 3 days.</p>` : "";
+  run(buildA(q, ids), (o) => `<p><b>English:</b> ${esc(o.replyEn)}</p><p><b>हिंदी:</b> ${esc(o.replyHi)}</p>
+    <span class="tag">task=${esc(o.task)}</span><span class="tag">amount=${esc(o.suggestedAmountInr)}</span>
+    <span class="tag">scamAlert=${esc(o.isScamAlert)}</span><span class="tag">abstained=${esc(o.abstained)}</span>`, pre);
+};
+$("check").onclick = () => {
+  const m = $("qb").value.trim(); if (!m) return;
+  const badge = { SAFE: "🟢 SAFE", CAUTION: "🟡 CAUTION", HIGH_RISK: "🔴 HIGH RISK" };
+  run(buildB(m), (o) => `<h3 style="margin:0 0 8px">${badge[o.riskLevel] ?? esc(o.riskLevel)}</h3>
+    <p><b>Why:</b> ${esc(o.explanationEn)}</p><p><b>क्यों:</b> ${esc(o.explanationHi)}</p>
+    <p><b>Do:</b> ${esc(o.actionTipEn)}</p><p><b>करें:</b> ${esc(o.actionTipHi)}</p>`);
+};
+</script>
+</body>
+</html>

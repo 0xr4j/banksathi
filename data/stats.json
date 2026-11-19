@@ -1,0 +1,64 @@
+{
+  "total_rows": 1500,
+  "train_rows": 1274,
+  "eval_rows": 226,
+  "train_eval_leakage_count": 0,
+  "buckets": {
+    "safe_abstention": {
+      "rows": 240,
+      "pct": 16.0
+    },
+    "passbook_dbt_bsbda": {
+      "rows": 210,
+      "pct": 14.0
+    },
+    "transfer_ippb_bc": {
+      "rows": 210,
+      "pct": 14.0
+    },
+    "loan_kcc": {
+      "rows": 210,
+      "pct": 14.0
+    },
+    "withdraw_bc_le_10k": {
+      "rows": 180,
+      "pct": 12.0
+    },
+    "assistant_scam_alert": {
+      "rows": 150,
+      "pct": 10.0
+    },
+    "withdraw_branch_gt_10k": {
+      "rows": 150,
+      "pct": 10.0
+    },
+    "scam_high_risk": {
+      "rows": 60,
+      "pct": 4.0
+    },
+    "scam_safe": {
+      "rows": 45,
+      "pct": 3.0
+    },
+    "scam_caution": {
+      "rows": 45,
+      "pct": 3.0
+    }
+  },
+  "registers": {
+    "hl": {
+      "rows": 587,
+      "pct": 39.1
+    },
+    "en": {
+      "rows": 553,
+      "pct": 36.9
+    },
+    "hi": {
+      "rows": 360,
+      "pct": 24.0
+    }
+  },
+  "grounded_pct_task_a": 49.7,
+  "withdraw_share_pct": 22.0
+}

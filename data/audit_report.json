@@ -1,0 +1,42 @@
+{
+  "mode": "dataset_audit",
+  "total_rows": 1500,
+  "train_rows": 1274,
+  "eval_rows": 226,
+  "valid_json_pct": 100.0,
+  "devanagari_parity_pct": 100.0,
+  "tts_word_cap_pct": 100.0,
+  "train_eval_leakage_count": 0,
+  "duplicate_query_count": 0,
+  "withdraw_share_pct": 22.0,
+  "max_bucket_share_pct": 16.0,
+  "buckets": {
+    "safe_abstention": 240,
+    "passbook_dbt_bsbda": 210,
+    "transfer_ippb_bc": 210,
+    "loan_kcc": 210,
+    "withdraw_bc_le_10k": 180,
+    "assistant_scam_alert": 150,
+    "withdraw_branch_gt_10k": 150,
+    "scam_high_risk": 60,
+    "scam_safe": 45,
+    "scam_caution": 45
+  },
+  "registers": {
+    "hl": 587,
+    "en": 553,
+    "hi": 360
+  },
+  "problems_sample": [],
+  "gates": {
+    "valid_json_pct == 100": true,
+    "devanagari_parity_pct == 100": true,
+    "tts_word_cap_pct == 100": true,
+    "train_eval_leakage_count == 0": true,
+    "duplicate_query_count == 0": true,
+    "withdraw_share_pct <= 25": true,
+    "max_bucket_share_pct <= 16.5": true,
+    "no wrapper problems": true
+  },
+  "passed": true
+}
