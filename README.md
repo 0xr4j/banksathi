@@ -6,6 +6,7 @@
 
 **English · हिंदी · Hinglish** — fine-tuned Gemma-2 2B, trained for **₹0** on free GPUs, built to run **100% offline** on Android.
 
+[![Live demo](https://img.shields.io/badge/▶%20Live%20demo-in%20your%20browser-ff6f00)](https://huggingface.co/spaces/0xr4j/banksathi-demo)
 [![Model on Hugging Face](https://img.shields.io/badge/🤗%20Model-0xr4j%2Fbanksathi--gemma2--2b-yellow)](https://huggingface.co/0xr4j/banksathi-gemma2-2b)
 [![Base](https://img.shields.io/badge/base-Gemma--2%202B%20IT-4285F4?logo=google)](https://huggingface.co/google/gemma-2-2b-it)
 [![Method](https://img.shields.io/badge/method-QLoRA%204--bit-8A2BE2)](#-training-70-minutes-on-a-free-t4)
@@ -309,7 +310,7 @@ print(tok.decode(model.generate(**ids, max_new_tokens=200, do_sample=False)[0, i
 | | Link |
 |---|---|
 | 🤗 Model, adapter, `.bin`, dataset, reports | [huggingface.co/0xr4j/banksathi-gemma2-2b](https://huggingface.co/0xr4j/banksathi-gemma2-2b) |
-| 🧪 Demo | [huggingface.co/spaces/0xr4j/banksathi-demo](https://huggingface.co/spaces/0xr4j/banksathi-demo) (coming soon) |
+| 🧪 Live demo (runs in your browser) | [huggingface.co/spaces/0xr4j/banksathi-demo](https://huggingface.co/spaces/0xr4j/banksathi-demo) |
 | 🛠️ Pipeline code | [`gemma_training/`](gemma_training/) · details in [`gemma_training/README.md`](gemma_training/README.md) |
 
 ## 🧭 Roadmap
@@ -321,7 +322,7 @@ print(tok.decode(model.generate(**ids, max_new_tokens=200, do_sample=False)[0, i
 - [x] Public model on Hugging Face
 - [ ] Airplane-mode smoke test on a real phone
 - [ ] Close the JSON gap (`LOAN` → `LOAN_KCC`) and hit 5 / 5
-- [ ] In-browser demo
+- [x] In-browser demo (wllama + Q8_0 GGUF, no server)
 
 ---
 
